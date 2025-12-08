@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ThinkSwift | Storytelling Landing Page</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              cream: {
+                DEFAULT: '#FCFCF4',
+                dark: '#F5F5ED',
+                card: '#FFFFFF'
+              },
+              charcoal: {
+                DEFAULT: '#232428',
+                muted: '#5A5A5A',
+                light: '#8A8A8A'
+              },
+              coral: {
+                DEFAULT: '#FF8552',
+                hover: '#E6703E',
+                light: 'rgba(255, 133, 82, 0.15)',
+                glow: 'rgba(255, 133, 82, 0.4)'
+              }
+            },
+            fontFamily: {
+              display: ["'Darker Grotesque'", 'sans-serif'],
+              body: ["'Merriweather'", 'Georgia', 'serif'],
+              mono: ["'JetBrains Mono'", 'monospace']
+            },
+            fontSize: {
+              'display-hero': ['clamp(3.5rem, 10vw, 12rem)', { lineHeight: '0.95', letterSpacing: '-0.05em' }],
+              'display-lg': ['clamp(2.5rem, 6vw, 6rem)', { lineHeight: '1.0', letterSpacing: '-0.04em' }],
+              'display-md': ['clamp(2rem, 4vw, 4rem)', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
+              'h1': ['clamp(2rem, 4vw, 3.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+              'h2': ['clamp(1.75rem, 3vw, 2.5rem)', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      body {
+        background-color: #FCFCF4;
+        color: #232428;
+        font-family: 'Merriweather', Georgia, serif;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Dark mode body override */
+      html.dark body {
+        background-color: #232428;
+        color: #FCFCF4;
+      }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: #FCFCF4;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background-color: #FF8552;
+        border-radius: 9999px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #E6703E;
+      }
+
+      /* Dark Mode Scrollbar Overrides */
+      html.dark ::-webkit-scrollbar-track {
+        background: #232428;
+      }
+
+      html.dark ::-webkit-scrollbar-thumb:hover {
+        background-color: #FF9678;
+      }
+
+      /* Tablet/Touch Device Scrollbar Tweaks */
+      @media (pointer: coarse) {
+        ::-webkit-scrollbar {
+            width: 8px; /* Slightly thinner on touch */
+        }
+      }
+
+      /* Liquid Assistant Wobble Animation - Mesmerizing organic liquid flow */
+      @keyframes wobble {
+        0% {
+          border-radius: 65% 35% 55% 45% / 45% 65% 35% 55%;
+        }
+        5% {
+          border-radius: 62% 38% 50% 50% / 50% 62% 38% 50%;
+        }
+        10% {
+          border-radius: 55% 45% 45% 55% / 58% 55% 45% 42%;
+        }
+        15% {
+          border-radius: 48% 52% 50% 50% / 52% 48% 55% 45%;
+        }
+        20% {
+          border-radius: 42% 58% 55% 45% / 45% 45% 60% 40%;
+        }
+        25% {
+          border-radius: 38% 62% 60% 40% / 50% 42% 52% 48%;
+        }
+        30% {
+          border-radius: 42% 58% 58% 42% / 55% 45% 45% 55%;
+        }
+        35% {
+          border-radius: 48% 52% 52% 48% / 60% 50% 40% 50%;
+        }
+        40% {
+          border-radius: 55% 45% 45% 55% / 55% 55% 45% 45%;
+        }
+        45% {
+          border-radius: 60% 40% 40% 60% / 48% 58% 50% 42%;
+        }
+        50% {
+          border-radius: 58% 42% 38% 62% / 42% 60% 55% 38%;
+        }
+        55% {
+          border-radius: 52% 48% 42% 58% / 48% 55% 58% 42%;
+        }
+        60% {
+          border-radius: 45% 55% 48% 52% / 55% 48% 52% 48%;
+        }
+        65% {
+          border-radius: 40% 60% 55% 45% / 60% 42% 45% 55%;
+        }
+        70% {
+          border-radius: 45% 55% 60% 40% / 55% 38% 42% 58%;
+        }
+        75% {
+          border-radius: 52% 48% 55% 45% / 48% 45% 50% 55%;
+        }
+        80% {
+          border-radius: 58% 42% 48% 52% / 45% 52% 55% 48%;
+        }
+        85% {
+          border-radius: 62% 38% 45% 55% / 48% 58% 48% 42%;
+        }
+        90% {
+          border-radius: 65% 35% 48% 52% / 50% 62% 40% 48%;
+        }
+        95% {
+          border-radius: 65% 35% 52% 48% / 48% 64% 36% 52%;
+        }
+        100% {
+          border-radius: 65% 35% 55% 45% / 45% 65% 35% 55%;
+        }
+      }
+
+      .animate-wobble {
+        animation: wobble 20s linear infinite;
+        border-radius: 65% 35% 55% 45% / 45% 65% 35% 55%;
+      }
+
+      /* Pulse glow for the orb - breathing light effect */
+      @keyframes pulse-glow {
+        0%, 100% {
+          box-shadow: 
+            inset -20px -20px 40px rgba(255,255,255,0.5),
+            inset 20px 20px 40px rgba(255,133,82,0.2),
+            0 0 50px rgba(255,133,82,0.3),
+            0 0 100px rgba(255,133,82,0.15);
+        }
+        50% {
+          box-shadow: 
+            inset -18px -22px 42px rgba(255,255,255,0.55),
+            inset 22px 18px 38px rgba(255,133,82,0.22),
+            0 0 55px rgba(255,133,82,0.32),
+            0 0 110px rgba(255,133,82,0.16);
+        }
+      }
+
+      .animate-pulse-glow {
+        animation: pulse-glow 10s ease-in-out infinite;
+      }
+
+      /* Combined animation class for liquid orb - runs both wobble and glow together */
+      .animate-liquid-orb {
+        animation: wobble 20s linear infinite, pulse-glow 10s ease-in-out infinite;
+        border-radius: 65% 35% 55% 45% / 45% 65% 35% 55%;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
