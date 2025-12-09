@@ -471,7 +471,7 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
     }
   }, [isOpen, isDockedMode]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
 
     const userMessage: Message = {
@@ -482,28 +482,54 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const messageText = inputValue;
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate assistant response
-    setTimeout(() => {
-      const responses = [
-        "That's a great question! ThinkSwift specializes in AI automation solutions that help small businesses save time and scale efficiently. Would you like to know more about any specific service?",
-        "I'd be happy to help with that! Our team focuses on creating custom AI solutions tailored to your business needs. Would you like to schedule a free consultation?",
-        "Absolutely! We've helped many businesses automate their workflows and reduce manual tasks by up to 70%. What aspect of your business would you like to improve?",
-        "Great to hear from you! ThinkSwift offers everything from AI chatbots to full workflow automation. What challenges is your business currently facing?"
-      ];
+    try {
+      // Call n8n webhook agent
+      const response = await fetch('https://thinkswift.app.n8n.cloud/webhook/d39a8094-c99c-4453-99c5-90edbf796e49', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chatInput: messageText,
+          sessionId: sessionStorage.getItem('chatSessionId') || (() => {
+            const id = `session_${Date.now()}`;
+            sessionStorage.setItem('chatSessionId', id);
+            return id;
+          })()
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
+      const data = await response.json();
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: responses[Math.floor(Math.random() * responses.length)],
+        text: data.output || data.response || data.message || data.text || "I received your message but couldn't process it properly. Please try again.",
         sender: 'assistant',
         timestamp: new Date()
       };
       
       setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        sender: 'assistant',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
