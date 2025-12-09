@@ -1048,8 +1048,8 @@ const Solution: React.FC = () => {
               description="Flawless performance on every device. Fast loading speeds that Google loves." 
             />
             <FeatureCard 
-              title="Zero Maintenance Bloat" 
-              description="We build on robust stacks that don't break. Say goodbye to constant plugin updates." 
+              title="Zero Maintenance" 
+              description="We build on flexible tech platforms, allowing seamless updates." 
             />
           </div>
 
