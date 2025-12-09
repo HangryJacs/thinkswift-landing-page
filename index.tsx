@@ -380,7 +380,7 @@ const LiquidAssistant: React.FC = () => {
             transform: isDockedMode ? 'translate(-50%, -100%)' : 'translate(20px, 20px)' 
           }}
         >
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full text-white text-[10px] font-bold tracking-widest uppercase whitespace-nowrap shadow-2xl drop-shadow-lg">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full text-charcoal dark:text-white text-[10px] font-bold tracking-widest uppercase whitespace-nowrap shadow-2xl drop-shadow-lg">
             {isChatOpen ? 'Close Chat' : 'Chat with Penelope'}
           </div>
         </div>
@@ -724,12 +724,12 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
       ref={popupRef}
       className={containerClasses}
       style={isMobile ? undefined : positionStyles}
+      onWheel={(e) => e.stopPropagation()}
     >
       {/* Header */}
       <div className={`flex items-center justify-between border-b border-white/20 dark:border-white/10 bg-white/30 dark:bg-white/5 ${isMobile ? 'px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))]' : 'px-5 py-4'}`}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-coral to-coral/60 flex items-center justify-center shadow-lg">
-            <Sparkles size={18} className="text-white" />
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-coral to-coral/60 flex items-center justify-center shadow-lg animate-[wobble_6s_ease-in-out_infinite]">
           </div>
           <div>
             <h3 className="font-display font-semibold text-charcoal dark:text-cream text-base">Penelope</h3>
@@ -1163,6 +1163,7 @@ const Pricing: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const priceRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   useGSAP(() => {
     if (priceRef.current) {
@@ -1244,9 +1245,77 @@ const Pricing: React.FC = () => {
               </li>
             ))}
           </ul>
+
+          {/* Maintenance Package Banner - Inside Card */}
+          <div className="mt-8 pt-6 border-t border-charcoal/10 dark:border-white/10">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-lg font-semibold text-charcoal dark:text-cream">Want ongoing peace of mind?</span>
+              </div>
+              <p className="text-charcoal-muted dark:text-white/60 mb-3">
+                Add our Maintenance Package for just <span className="font-semibold text-coral">$99/month</span>
+              </p>
+              <div className="relative inline-block">
+                <button
+                  onMouseEnter={() => setShowTooltip(true)}
+                  onMouseLeave={() => setShowTooltip(false)}
+                  onFocus={() => setShowTooltip(true)}
+                  onBlur={() => setShowTooltip(false)}
+                  className="text-coral hover:text-coral-hover underline underline-offset-4 font-medium transition-colors cursor-pointer"
+                  aria-label="Learn more about maintenance package"
+                >
+                  Learn More
+                </button>
+                
+                {/* Tooltip */}
+                {showTooltip && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 bg-cream/80 dark:bg-charcoal/80 backdrop-blur-md text-charcoal dark:text-cream p-4 rounded-xl shadow-xl z-50 text-left border border-charcoal/5 dark:border-white/10">
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+                      <div className="w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-cream/80 dark:border-t-charcoal/80"></div>
+                    </div>
+                    <p className="font-semibold mb-2 text-sm">What's Included:</p>
+                    <ul className="space-y-1 text-xs">
+                      <li className="flex items-start gap-2">
+                        <span className="text-coral mt-0.5">✓</span>
+                        <span>Website hosting included</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-coral mt-0.5">✓</span>
+                        <span>Software updates and security</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-coral mt-0.5">✓</span>
+                        <span>Chatbot refinement and optimization</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-coral mt-0.5">✓</span>
+                        <span>Technical support</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-coral mt-0.5">✓</span>
+                        <span>Monthly performance reports</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-coral mt-0.5">✓</span>
+                        <span>2 content updates per month</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-coral mt-0.5">✓</span>
+                        <span>Daily backups and security monitoring</span>
+                      </li>
+                    </ul>
+                    <p className="mt-3 pt-2 border-t border-white/20 dark:border-charcoal/20 text-xs italic">
+                      Best For: Business owners who want hands-off management
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="mt-10 text-center">
             <CTAButton href="#contact" className="w-full">Get Started Today</CTAButton>
-            <p className="text-xs text-charcoal-light dark:text-white/40 mt-4 uppercase tracking-wider font-sans font-semibold">Limited availability per month</p>
+            <p className="text-xs text-charcoal-light dark:text-white/40 mt-4 uppercase tracking-wider font-sans font-semibold">Limited to 20 Clients in December</p>
           </div>
         </div>
       </div>
@@ -1435,10 +1504,10 @@ const Navbar: React.FC<NavbarProps> = () => {
       </div>
 
       <nav 
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center justify-center md:justify-between w-[90%] md:w-[60%] lg:w-[50%] xl:w-fit pl-4 pr-4 py-2 bg-cream/80 dark:bg-charcoal/80 backdrop-blur-md border border-charcoal/5 dark:border-white/10 rounded-full shadow-2xl transition-all duration-300 md:pl-8 md:pr-2 md:py-2 md:max-w-none"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center justify-center md:justify-between w-[90%] md:w-[60%] lg:w-[50%] xl:w-fit pl-4 pr-4 py-3 bg-cream/80 dark:bg-charcoal/80 backdrop-blur-md border border-charcoal/5 dark:border-white/10 rounded-full shadow-2xl transition-all duration-300 md:pl-8 md:pr-2 md:py-2 md:max-w-none"
       >
         {/* Brand */}
-        <a href="https://www.thinkswift.au/" target="_blank" rel="noopener noreferrer" className="text-base text-charcoal dark:text-cream tracking-tight whitespace-nowrap" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 900 }}>
+        <a href="https://www.thinkswift.au/" target="_blank" rel="noopener noreferrer" className="text-base text-charcoal dark:text-cream tracking-tight whitespace-nowrap pl-2" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 900 }}>
           ThinkSwift
         </a>
         
