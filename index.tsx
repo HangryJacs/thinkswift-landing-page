@@ -891,7 +891,7 @@ const Hero: React.FC = () => {
               ref={headlineRef} 
               className="text-display-hero font-display font-medium text-charcoal dark:text-cream mb-4 md:mb-12 leading-[0.9] tracking-tighter lowercase transition-colors duration-300"
             >
-              inspired today, ready<br />for tomorrow
+              inspired today<br />ready for <span className="whitespace-nowrap">tomorrow</span>
             </h1>
         </div>
 
