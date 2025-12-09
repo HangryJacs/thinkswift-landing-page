@@ -92,9 +92,9 @@ const CTAButton: React.FC<CTAButtonProps> = ({
 }) => {
   const buttonRef = useRef<HTMLAnchorElement>(null);
   
-  const baseClasses = "inline-flex items-center justify-center rounded-full font-semibold text-base tracking-wide transition-all duration-300 transform font-sans hover:-translate-y-0.5";
+  const baseClasses = "inline-flex items-center justify-center rounded-full font-semibold text-base tracking-wide transition-all duration-300 transform font-sans";
   const variants = {
-    primary: "bg-coral hover:bg-coral-hover text-[#FCFCF4] shadow-[0_4px_16px_rgba(255,133,82,0.2)] hover:scale-105",
+    primary: "bg-coral hover:bg-coral-hover text-[#FCFCF4] shadow-[0_4px_16px_rgba(255,133,82,0.2)] hover:shadow-[0_8px_24px_rgba(255,133,82,0.4)]",
     outline: "border border-charcoal/20 hover:bg-charcoal/5 text-charcoal dark:border-white/20 dark:text-cream dark:hover:bg-white/10"
   };
 
@@ -372,14 +372,14 @@ const LiquidAssistant: React.FC = () => {
         
         {/* Hover Label */}
         <div 
-          className={`absolute pointer-events-none transition-all duration-300 ease-out z-20 ${isHovered && !isChatOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
+          className={`absolute pointer-events-none transition-opacity duration-300 ease-out z-20 ${isHovered && !isChatOpen ? 'opacity-100' : 'opacity-0'}`}
           style={{
             left: isDockedMode ? '50%' : cursorPos.x,
             top: isDockedMode ? '-10px' : cursorPos.y,
-            transform: isDockedMode ? 'translate(-50%, -100%)' : 'translate(-50%, -150%)' 
+            transform: isDockedMode ? 'translate(-50%, -100%)' : 'translate(20px, 20px)' 
           }}
         >
-          <div className="bg-cream/90 dark:bg-charcoal/90 backdrop-blur-md border border-charcoal/10 dark:border-white/10 px-4 py-2 rounded-full text-xs font-semibold tracking-widest text-charcoal dark:text-cream uppercase whitespace-nowrap shadow-lg">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full text-white text-[10px] font-bold tracking-widest uppercase whitespace-nowrap shadow-2xl drop-shadow-lg">
             {isChatOpen ? 'Close Chat' : 'Chat with Penelope'}
           </div>
         </div>
@@ -427,49 +427,90 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+
+  const suggestions = [
+    "Book a discovery call",
+    "What services do you offer?",
+    "How much does it cost?",
+    "Tell me about AI automation"
+  ];
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when opened
+  // Focus input when opened (delay on mobile to prevent keyboard issues)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isMobile) {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
-  }, [isOpen]);
+  }, [isOpen, isMobile]);
+
+  // Lock body scroll on mobile when chat is open
+  useEffect(() => {
+    if (isMobile && isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [isMobile, isOpen]);
 
   // Animate in/out with GSAP
   useGSAP(() => {
     if (!popupRef.current) return;
     
     if (isOpen) {
-      // Animate from the direction of the orb
-      // In hero mode: orb is to the right, so animate from right
-      // In docked mode: orb is bottom-right, so animate from bottom-right
-      const transformOrigin = isDockedMode ? 'bottom right' : 'center right';
-      
-      gsap.fromTo(popupRef.current, 
-        { 
-          opacity: 0, 
-          scale: 0.85, 
-          x: isDockedMode ? 20 : 40,
-          transformOrigin
-        },
-        { 
-          opacity: 1, 
-          scale: 1, 
-          x: 0,
-          duration: 0.4, 
-          ease: 'back.out(1.4)' 
-        }
-      );
+      if (isMobile) {
+        // Mobile: slide up from bottom
+        gsap.fromTo(popupRef.current, 
+          { 
+            opacity: 0, 
+            y: 50,
+          },
+          { 
+            opacity: 1, 
+            y: 0,
+            duration: 0.3, 
+            ease: 'power2.out' 
+          }
+        );
+      } else {
+        // Desktop: animate from the direction of the orb
+        const transformOrigin = isDockedMode ? 'bottom right' : 'center right';
+        
+        gsap.fromTo(popupRef.current, 
+          { 
+            opacity: 0, 
+            scale: 0.85, 
+            x: isDockedMode ? 20 : 40,
+            transformOrigin
+          },
+          { 
+            opacity: 1, 
+            scale: 1, 
+            x: 0,
+            duration: 0.4, 
+            ease: 'back.out(1.4)' 
+          }
+        );
+      }
     }
-  }, [isOpen, isDockedMode]);
+  }, [isOpen, isDockedMode, isMobile]);
 
   const handleSend = async () => {
     if (!inputValue.trim()) return;
@@ -539,12 +580,72 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
     }
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    setShowSuggestions(false);
+    setInputValue(suggestion);
+    // Trigger send after a brief delay to show the selection
+    setTimeout(() => {
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        text: suggestion,
+        sender: 'user',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, userMessage]);
+      setInputValue('');
+      setIsTyping(true);
+
+      // Call the API
+      fetch('https://thinkswift.app.n8n.cloud/webhook/d39a8094-c99c-4453-99c5-90edbf796e49', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chatInput: suggestion,
+          sessionId: sessionStorage.getItem('chatSessionId') || (() => {
+            const id = `session_${Date.now()}`;
+            sessionStorage.setItem('chatSessionId', id);
+            return id;
+          })()
+        }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            text: data.output || data.response || data.message || data.text || "I received your message but couldn't process it properly.",
+            sender: 'assistant',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, assistantMessage]);
+        })
+        .catch(() => {
+          const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            text: "Sorry, I'm having trouble connecting right now. Please try again.",
+            sender: 'assistant',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, errorMessage]);
+        })
+        .finally(() => setIsTyping(false));
+    }, 100);
+  };
+
   if (!isOpen) return null;
 
-  // Calculate position based on orb state
-  // When in hero (not docked): position to the left of the orb
-  // When docked: position above and to the left of the docked orb
+  // Calculate position based on orb state and device
   const getPositionStyles = (): React.CSSProperties => {
+    // Mobile: fullscreen overlay
+    if (isMobile) {
+      return {
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      };
+    }
+
+    // Desktop positioning
     if (!orbPosition) {
       // Fallback position
       return {
@@ -556,7 +657,7 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
     if (isDockedMode) {
       // Docked mode: position above the orb in bottom-right
       return {
-        bottom: '6rem', // Above navbar on mobile
+        bottom: '6rem', // Above navbar
         right: '7rem', // To the left of docked orb
       };
     } else {
@@ -580,14 +681,19 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
 
   const positionStyles = getPositionStyles();
 
+  // Container classes - fullscreen on mobile, floating card on desktop
+  const containerClasses = isMobile
+    ? "fixed inset-0 bg-cream dark:bg-charcoal flex flex-col z-[100]"
+    : "fixed w-[calc(100vw-2rem)] max-w-[400px] h-[500px] max-h-[70vh] bg-cream/70 dark:bg-charcoal/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-white/10 flex flex-col overflow-hidden z-[80]";
+
   return (
     <div 
       ref={popupRef}
-      className="fixed w-[calc(100vw-2rem)] max-w-[400px] h-[500px] max-h-[70vh] bg-cream/70 dark:bg-charcoal/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-white/10 flex flex-col overflow-hidden z-[80]"
-      style={positionStyles}
+      className={containerClasses}
+      style={isMobile ? undefined : positionStyles}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/20 dark:border-white/10 bg-white/30 dark:bg-white/5">
+      <div className={`flex items-center justify-between border-b border-white/20 dark:border-white/10 bg-white/30 dark:bg-white/5 ${isMobile ? 'px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))]' : 'px-5 py-4'}`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-coral to-coral/60 flex items-center justify-center shadow-lg">
             <Sparkles size={18} className="text-white" />
@@ -599,10 +705,10 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
         </div>
         <button 
           onClick={onClose}
-          className="p-2 rounded-full hover:bg-white/40 dark:hover:bg-white/10 transition-colors text-charcoal dark:text-cream backdrop-blur-sm"
+          className={`rounded-full hover:bg-white/40 dark:hover:bg-white/10 transition-colors text-charcoal dark:text-cream backdrop-blur-sm ${isMobile ? 'p-3' : 'p-2'}`}
           aria-label="Close chat"
         >
-          <X size={20} />
+          <X size={isMobile ? 24 : 20} />
         </button>
       </div>
 
@@ -624,6 +730,21 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
             </div>
           </div>
         ))}
+
+        {/* Suggestion Buttons */}
+        {showSuggestions && messages.length === 1 && !isTyping && (
+          <div className="flex flex-wrap gap-2 pt-2">
+            {suggestions.map((suggestion, index) => (
+              <button
+                key={index}
+                onClick={() => handleSuggestionClick(suggestion)}
+                className="px-3 py-2 text-xs font-medium bg-white/30 dark:bg-white/10 hover:bg-coral/20 dark:hover:bg-coral/20 text-charcoal dark:text-cream border border-charcoal/10 dark:border-white/20 rounded-full backdrop-blur-sm transition-all duration-200 hover:border-coral/30"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        )}
         
         {/* Typing indicator */}
         {isTyping && (
@@ -642,7 +763,7 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-white/20 dark:border-white/10 bg-white/30 dark:bg-white/5">
+      <div className={`border-t border-white/20 dark:border-white/10 bg-white/30 dark:bg-white/5 ${isMobile ? 'px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]' : 'px-4 py-3'}`}>
         <div className="flex items-center gap-2">
           <input
             ref={inputRef}
@@ -651,15 +772,15 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-3 bg-white/50 dark:bg-white/10 rounded-full text-sm text-charcoal dark:text-cream placeholder:text-charcoal/40 dark:placeholder:text-white/40 outline-none focus:ring-2 focus:ring-coral/30 transition-all backdrop-blur-sm"
+            className={`flex-1 bg-white/50 dark:bg-white/10 rounded-full text-charcoal dark:text-cream placeholder:text-charcoal/40 dark:placeholder:text-white/40 outline-none focus:ring-2 focus:ring-coral/30 transition-all backdrop-blur-sm ${isMobile ? 'px-4 py-4 text-base' : 'px-4 py-3 text-sm'}`}
           />
           <button
             onClick={handleSend}
             disabled={!inputValue.trim()}
-            className="p-3 rounded-full bg-coral hover:bg-coral-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all text-white"
+            className={`rounded-full bg-coral hover:bg-coral-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all text-white ${isMobile ? 'p-4' : 'p-3'}`}
             aria-label="Send message"
           >
-            <Send size={18} />
+            <Send size={isMobile ? 20 : 18} />
           </button>
         </div>
         <p className="text-[10px] text-charcoal/40 dark:text-white/30 text-center mt-2">
@@ -798,7 +919,7 @@ const Hero: React.FC = () => {
                 <StatMarker value="2-3" label="WEEKS DELIVERY" />
               </div>
               <div ref={ctaRef}>
-                <CTAButton href="#contact">Book Discovery Call</CTAButton>
+                <CTAButton href="tel:+61421236094">Call Now</CTAButton>
               </div>
             </div>
           </div>
@@ -1190,8 +1311,8 @@ const Footer: React.FC = () => {
             <h2 className="text-display-lg font-display font-medium leading-none mb-8">
               ready to <br/><span className="text-coral">start?</span>
             </h2>
-            <CTAButton href="mailto:hello@thinkswift.com" variant="primary" className="bg-white text-charcoal hover:bg-coral hover:text-charcoal">
-              Book Discovery Call
+            <CTAButton href="tel:+61421236094" variant="primary" className="bg-white text-charcoal hover:bg-coral hover:text-charcoal">
+              Call Now
             </CTAButton>
           </div>
           
@@ -1280,10 +1401,10 @@ const Navbar: React.FC<NavbarProps> = () => {
       </div>
 
       <nav 
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center justify-center md:justify-between w-[90%] md:w-[60%] lg:w-[50%] xl:w-fit px-6 py-3 bg-cream/80 dark:bg-charcoal/80 backdrop-blur-md border border-charcoal/5 dark:border-white/10 rounded-full shadow-2xl transition-all duration-300 md:px-8 md:py-4 md:max-w-none"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center justify-center md:justify-between w-[90%] md:w-[60%] lg:w-[50%] xl:w-fit pl-4 pr-4 py-2 bg-cream/80 dark:bg-charcoal/80 backdrop-blur-md border border-charcoal/5 dark:border-white/10 rounded-full shadow-2xl transition-all duration-300 md:pl-8 md:pr-2 md:py-2 md:max-w-none"
       >
         {/* Brand */}
-        <a href="/" className="text-lg font-semibold text-charcoal dark:text-cream tracking-tight font-display whitespace-nowrap">
+        <a href="https://www.thinkswift.au/" target="_blank" rel="noopener noreferrer" className="text-base text-charcoal dark:text-cream tracking-tight whitespace-nowrap" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 900 }}>
           ThinkSwift
         </a>
         
@@ -1295,17 +1416,18 @@ const Navbar: React.FC<NavbarProps> = () => {
         </div>
 
         {/* Actions Group */}
-        <div className="flex items-center gap-3 md:gap-4 ml-auto md:ml-0">
-          <CTAButton href="#contact" className="inline-flex !py-2 !px-5 text-sm whitespace-nowrap" onClick={() => setMobileMenuOpen(false)}>
-            Book Call
+        <div className="flex items-center gap-2 md:gap-4 ml-auto md:ml-0">
+          <CTAButton href="tel:+61421236094" className="whitespace-nowrap !px-4 !py-2 !text-sm md:!px-8 md:!py-4 md:!text-base" onClick={() => setMobileMenuOpen(false)}>
+            Call Now
           </CTAButton>
 
           {/* Mobile Menu Toggle (Visible on Tablet/Mobile) */}
           <button 
-            className="lg:hidden text-charcoal dark:text-cream p-1"
+            className="lg:hidden text-charcoal dark:text-cream p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </nav>
@@ -1316,8 +1438,8 @@ const Navbar: React.FC<NavbarProps> = () => {
            <a href="#system" className="text-3xl font-display font-medium text-charcoal dark:text-cream" onClick={(e) => scrollToSection(e, '#system')}>Solution</a>
            <a href="#pricing" className="text-3xl font-display font-medium text-charcoal dark:text-cream" onClick={(e) => scrollToSection(e, '#pricing')}>Pricing</a>
            <a href="#process" className="text-3xl font-display font-medium text-charcoal dark:text-cream" onClick={(e) => scrollToSection(e, '#process')}>Process</a>
-           <CTAButton href="#contact" className="w-full max-w-xs text-center" onClick={() => setMobileMenuOpen(false)}>
-            Book Discovery Call
+           <CTAButton href="tel:+61421236094" className="w-full max-w-xs text-center" onClick={() => setMobileMenuOpen(false)}>
+            Call Now
           </CTAButton>
            <button onClick={() => setMobileMenuOpen(false)} className="absolute top-6 right-6 p-2 text-charcoal dark:text-cream">
              <X size={24} />
