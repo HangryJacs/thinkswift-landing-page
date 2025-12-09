@@ -1214,83 +1214,39 @@ const Pricing: React.FC = () => {
 
   return (
     <section id="pricing" ref={sectionRef} className="py-32 px-6 bg-cream dark:bg-charcoal transition-colors duration-300">
-      <div className="max-w-6xl mx-auto text-center">
+      <div className="max-w-4xl mx-auto text-center">
         <SectionLabel>THE INVESTMENT</SectionLabel>
         
-        <div className="grid md:grid-cols-2 gap-8 mt-16 items-stretch">
-          {/* Option 1: Build Only */}
-          <div ref={featuresRef} className="bg-white dark:bg-white/5 p-8 md:p-10 rounded-2xl shadow-sm dark:shadow-none border border-charcoal/5 dark:border-white/5 transition-all duration-300 flex flex-col h-full">
-            <div className="mb-8">
-              <div className="text-5xl md:text-6xl font-display font-normal text-charcoal dark:text-cream leading-none tracking-tight transition-colors duration-300">
-                $500
-              </div>
-              <p className="text-lg text-charcoal-muted dark:text-white/60 font-light mt-4 transition-colors duration-300">
-                One-time build fee.
-              </p>
-            </div>
-
-            <h3 className="text-sm font-semibold text-charcoal dark:text-cream mb-6 uppercase tracking-widest text-center font-sans">Build Only</h3>
-            
-            <ul className="space-y-4 text-left mb-8 flex-1">
-              {[
-                "Custom Design & Development",
-                "AI Chatbot Configuration",
-                "1-Hour Personal AI Training",
-                "Mobile Responsive Layout",
-                "SEO Foundation Setup",
-                "Contact Form Integration",
-                "1 Month Post-Launch Support"
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="text-coral mt-1">✓</span>
-                  <span className="text-charcoal-muted dark:text-white/70 text-base">{item}</span>
-                </li>
-              ))}
-            </ul>
-            
-            <div className="mt-auto text-center">
-              <CTAButton href="#contact" variant="outline" className="w-full">Get Started</CTAButton>
-              <p className="text-xs text-charcoal-light dark:text-white/40 mt-4 uppercase tracking-wider font-sans font-semibold">Limited availability</p>
-            </div>
+        <div className="mt-12 mb-8">
+          <div ref={priceRef} className="text-[6rem] md:text-[10rem] font-display font-normal text-charcoal dark:text-cream leading-none tracking-tight transition-colors duration-300">
+            $500
           </div>
+          <p className="text-xl md:text-2xl text-charcoal-muted dark:text-white/60 font-light mt-4 transition-colors duration-300">
+            One-time build fee. Zero recurring bloat.
+          </p>
+        </div>
 
-          {/* Option 2: Build + Maintenance */}
-          <div className="bg-white dark:bg-white/5 p-8 md:p-10 rounded-2xl shadow-xl dark:shadow-none border-2 border-coral/20 dark:border-coral/20 transition-all duration-300 flex flex-col h-full relative overflow-hidden transform md:-translate-y-4">
-            <div className="absolute top-0 right-0 bg-coral text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">Most Popular</div>
-            
-            <div className="mb-8">
-              <div className="text-4xl md:text-5xl font-display font-normal text-charcoal dark:text-cream leading-none tracking-tight transition-colors duration-300 flex items-baseline justify-center gap-2">
-                $500 <span className="text-2xl md:text-3xl text-charcoal-muted dark:text-white/60">+ $99/mo</span>
-              </div>
-              <p className="text-lg text-charcoal-muted dark:text-white/60 font-light mt-4 transition-colors duration-300">
-                Build + Monthly Growth
-              </p>
-            </div>
-
-            <h3 className="text-sm font-semibold text-charcoal dark:text-cream mb-6 uppercase tracking-widest text-center font-sans">Build + Maintenance</h3>
-            
-            <ul className="space-y-4 text-left mb-8 flex-1">
-              <li className="font-semibold text-charcoal dark:text-cream text-sm uppercase tracking-wide mb-2 border-b border-charcoal/10 dark:border-white/10 pb-2">Everything in Build Only, PLUS:</li>
-              {[
-                "Website hosting included",
-                "Software updates and security",
-                "Chatbot refinement and optimization",
-                "Technical support",
-                "Monthly performance reports",
-                "2 content updates per month",
-                "Daily backups and security monitoring"
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="text-coral mt-1">✓</span>
-                  <span className="text-charcoal-muted dark:text-white/70 text-base">{item}</span>
-                </li>
-              ))}
-            </ul>
-            
-            <div className="mt-auto text-center">
-              <CTAButton href="#contact" className="w-full">Get Started</CTAButton>
-              <p className="text-xs text-charcoal-light dark:text-white/40 mt-4 font-sans italic">Best For: Business owners who want hands-off management</p>
-            </div>
+        <div ref={featuresRef} className="max-w-xl mx-auto text-left bg-white dark:bg-white/5 p-8 md:p-12 rounded-2xl shadow-sm dark:shadow-none border border-charcoal/5 dark:border-white/5 transition-all duration-300">
+          <h3 className="text-lg font-semibold text-charcoal dark:text-cream mb-6 uppercase tracking-widest text-center font-sans">What's Included</h3>
+          <ul className="space-y-4">
+            {[
+              "Custom Design & Development",
+              "AI Chatbot Configuration",
+              "1-Hour Personal AI Training",
+              "Mobile Responsive Layout",
+              "SEO Foundation Setup",
+              "Contact Form Integration",
+              "1 Month Post-Launch Support"
+            ].map((item, i) => (
+              <li key={i} className="flex items-center gap-3">
+                <span className="text-coral">✓</span>
+                <span className="text-charcoal-muted dark:text-white/70 text-lg">{item}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-10 text-center">
+            <CTAButton href="#contact" className="w-full">Get Started Today</CTAButton>
+            <p className="text-xs text-charcoal-light dark:text-white/40 mt-4 uppercase tracking-wider font-sans font-semibold">Limited availability per month</p>
           </div>
         </div>
       </div>
