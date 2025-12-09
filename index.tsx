@@ -1314,7 +1314,7 @@ const Pricing: React.FC = () => {
           </div>
 
           <div className="mt-10 text-center">
-            <CTAButton href="#contact" className="w-full">Get Started Today</CTAButton>
+            <CTAButton href="mailto:hello@thinkswift.au" className="w-full">Get Started Today</CTAButton>
             <p className="text-xs text-charcoal-light dark:text-white/40 mt-4 uppercase tracking-wider font-sans font-semibold">Limited to 20 Clients in December</p>
           </div>
         </div>
