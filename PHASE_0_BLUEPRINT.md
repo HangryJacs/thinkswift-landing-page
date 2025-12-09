@@ -10,7 +10,7 @@
 ### 2. Page Sections
 - **Hero Section:**
   - `SectionLabel`: "( THE OFFER )" - Animated slide up.
-  - `AnimatedHeadline`: "your business deserves better" - `SplitType` char-reveal, lowercase `Darker Grotesque`.
+  - `AnimatedHeadline`: "inspired today, ready for tomorrow" - `SplitType` char-reveal, lowercase `Darker Grotesque`.
   - `FadeUpText`: Subtext describing the $500 offer.
   - `StatsBar`: Container for `StatMarker`s ("* $500 ONE-TIME", "* NO MONTHLY FEES").
   - `CTAButton`: "Book Discovery Call" - Coral glow hover.
