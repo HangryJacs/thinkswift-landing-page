@@ -432,6 +432,7 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+  const viewportHeightRef = useRef<number>(typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.height : window.innerHeight);
 
   const suggestions = [
     "Book a discovery call",
@@ -459,6 +460,37 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen, isMobile]);
+
+  // Scroll when input receives focus (helps mobile keyboards)
+  const handleInputFocus = () => {
+    // allow keyboard to open, then scroll messages into view
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 200);
+  };
+
+  // Listen for visualViewport resize (mobile keyboard open/close) and scroll to bottom when it appears
+  useEffect(() => {
+    const vv = (typeof window !== 'undefined' && window.visualViewport) ? window.visualViewport : null;
+    let lastHeight = viewportHeightRef.current;
+
+    const onResize = () => {
+      const newH = vv ? vv.height : window.innerHeight;
+      // If viewport height decreased, keyboard likely opened — scroll to bottom
+      if (newH < lastHeight) {
+        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+      }
+      lastHeight = newH;
+    };
+
+    if (vv) {
+      vv.addEventListener('resize', onResize);
+      return () => vv.removeEventListener('resize', onResize);
+    } else {
+      window.addEventListener('resize', onResize);
+      return () => window.removeEventListener('resize', onResize);
+    }
+  }, [isMobile]);
 
   // Lock body scroll on mobile when chat is open
   useEffect(() => {
@@ -770,6 +802,7 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onFocus={handleInputFocus}
             onKeyPress={handleKeyPress}
             placeholder="Type a message..."
             className={`flex-1 bg-white/50 dark:bg-white/10 rounded-full text-charcoal dark:text-cream placeholder:text-charcoal/40 dark:placeholder:text-white/40 outline-none focus:ring-2 focus:ring-coral/30 transition-all backdrop-blur-sm ${isMobile ? 'px-4 py-4 text-base' : 'px-4 py-3 text-sm'}`}
