@@ -11,6 +11,83 @@ import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
+// --- Simple Markdown Parser for Chat ---
+const parseMarkdown = (text: string): React.ReactNode => {
+  // Split by newlines to handle paragraphs and lists
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  let listItems: string[] = [];
+  
+  const processInlineFormatting = (line: string): React.ReactNode => {
+    // Handle bold (**text** or __text__)
+    const parts: React.ReactNode[] = [];
+    let remaining = line;
+    let key = 0;
+    
+    while (remaining) {
+      // Match **bold** or __bold__
+      const boldMatch = remaining.match(/(\*\*|__)(.+?)\1/);
+      if (boldMatch && boldMatch.index !== undefined) {
+        // Add text before the match
+        if (boldMatch.index > 0) {
+          parts.push(remaining.slice(0, boldMatch.index));
+        }
+        // Add bold text
+        parts.push(<strong key={key++} className="font-semibold">{boldMatch[2]}</strong>);
+        remaining = remaining.slice(boldMatch.index + boldMatch[0].length);
+      } else {
+        parts.push(remaining);
+        break;
+      }
+    }
+    
+    return parts.length === 1 ? parts[0] : parts;
+  };
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      elements.push(
+        <ul key={elements.length} className="list-disc list-inside space-y-1 my-2">
+          {listItems.map((item, i) => (
+            <li key={i}>{processInlineFormatting(item)}</li>
+          ))}
+        </ul>
+      );
+      listItems = [];
+    }
+  };
+
+  lines.forEach((line, index) => {
+    const trimmedLine = line.trim();
+    
+    // Check for bullet points (-, *, •)
+    const bulletMatch = trimmedLine.match(/^[-*•]\s+(.+)$/);
+    if (bulletMatch) {
+      listItems.push(bulletMatch[1]);
+    } else {
+      // Flush any pending list items
+      flushList();
+      
+      if (trimmedLine) {
+        elements.push(
+          <span key={elements.length}>
+            {processInlineFormatting(trimmedLine)}
+            {index < lines.length - 1 && <br />}
+          </span>
+        );
+      } else if (index < lines.length - 1) {
+        // Empty line = paragraph break
+        elements.push(<br key={elements.length} />);
+      }
+    }
+  });
+  
+  // Flush any remaining list items
+  flushList();
+  
+  return <>{elements}</>;
+};
+
 declare global {
   interface Window {
     lenis?: Lenis;
@@ -759,7 +836,7 @@ const ChatPopup: React.FC<ChatPopupProps> = ({ isOpen, onClose, isDockedMode, or
                   : 'bg-white/50 dark:bg-white/10 text-charcoal dark:text-cream rounded-bl-md shadow-sm'
               }`}
             >
-              {message.text}
+              {message.sender === 'user' ? message.text : parseMarkdown(message.text)}
             </div>
           </div>
         ))}
